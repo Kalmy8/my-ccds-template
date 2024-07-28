@@ -5,6 +5,7 @@ black
 build
 chardet
 flake8
+mypy-extensions
 isort
 mkdocs
 mkdocs-material
