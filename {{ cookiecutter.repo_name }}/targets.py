@@ -1,4 +1,4 @@
-from invoke import task
+from invoke import task, Collection
 import os
 import shutil
 
@@ -8,7 +8,8 @@ PYTHON_INTERPRETER = "python"
 MODULE_NAME = "{{ cookiecutter.module_name }}"
 DEPENDENCY_FILE = "{{ cookiecutter.dependency_file }}"
 ENVIRONMENT_MANAGER = "{{ cookiecutter.environment_manager }}"
-DATASET_STORAGE = "{{ cookiecutter.dataset_storage }}"
+DATASET_STORAGE = {{ cookiecutter.dataset_storage | tojson }}
+
 
 @task
 def requirements(ctx):
@@ -48,32 +49,32 @@ def format(ctx):
 def sync_data_down(ctx):
     """Download Data from storage system"""
     if DATASET_STORAGE:
-        if DATASET_STORAGE == "s3":
-            bucket = "{{ cookiecutter.dataset_storage.s3.bucket }}"
-            profile = "{{ cookiecutter.dataset_storage.s3.aws_profile }}"
+        if "s3" in DATASET_STORAGE:
+            bucket = DATASET_STORAGE["s3"].get("bucket", "")
+            profile = DATASET_STORAGE["s3"].get("aws_profile", "default")
             profile_option = f" --profile {profile}" if profile != "default" else ""
             ctx.run(f"aws s3 sync s3://{bucket}/data/ data/{profile_option}")
-        elif DATASET_STORAGE == "azure":
-            container = "{{ cookiecutter.dataset_storage.azure.container }}"
+        elif "azure" in DATASET_STORAGE:
+            container = DATASET_STORAGE["azure"].get("container", "")
             ctx.run(f"az storage blob download-batch -s {container}/data/ -d data/")
-        elif DATASET_STORAGE == "gcs":
-            bucket = "{{ cookiecutter.dataset_storage.gcs.bucket }}"
+        elif "gcs" in DATASET_STORAGE:
+            bucket = DATASET_STORAGE["gcs"].get("bucket", "")
             ctx.run(f"gsutil -m rsync -r gs://{bucket}/data/ data/")
 
 @task
 def sync_data_up(ctx):
     """Upload Data to storage system"""
     if DATASET_STORAGE:
-        if DATASET_STORAGE == "s3":
-            bucket = "{{ cookiecutter.dataset_storage.s3.bucket }}"
-            profile = "{{ cookiecutter.dataset_storage.s3.aws_profile }}"
+        if "s3" in DATASET_STORAGE:
+            bucket = DATASET_STORAGE["s3"].get("bucket", "")
+            profile = DATASET_STORAGE["s3"].get("aws_profile", "default")
             profile_option = f" --profile {profile}" if profile != "default" else ""
             ctx.run(f"aws s3 sync data/ s3://{bucket}/data{profile_option}")
-        elif DATASET_STORAGE == "azure":
-            container = "{{ cookiecutter.dataset_storage.azure.container }}"
+        elif "azure" in DATASET_STORAGE:
+            container = DATASET_STORAGE["azure"].get("container", "")
             ctx.run(f"az storage blob upload-batch -d {container}/data/ -s data/")
-        elif DATASET_STORAGE == "gcs":
-            bucket = "{{ cookiecutter.dataset_storage.gcs.bucket }}"
+        elif "gcs" in DATASET_STORAGE:
+            bucket = DATASET_STORAGE["gcs"].get("bucket", "")
             ctx.run(f"gsutil -m rsync -r data/ gs://{bucket}/data/")
 
 @task
