@@ -6,17 +6,19 @@ PROJECT_NAME = "{{ cookiecutter.repo_name }}"
 PYTHON_VERSION = "{{ cookiecutter.python_version_number }}"
 PYTHON_INTERPRETER = "python"
 MODULE_NAME = "{{ cookiecutter.module_name }}"
+DEPENDENCY_FILE = "{{ cookiecutter.dependency_file }}"
+ENVIRONMENT_MANAGER = "{{ cookiecutter.environment_manager }}"
+DATASET_STORAGE = "{{ cookiecutter.dataset_storage }}"
 
 @task
 def requirements(ctx):
     """Install Python Dependencies"""
-    dependency_file = "{{ cookiecutter.dependency_file }}"
-    if dependency_file == "requirements.txt":
+    if DEPENDENCY_FILE == "requirements.txt":
         ctx.run(f"{PYTHON_INTERPRETER} -m pip install -U pip")
         ctx.run(f"{PYTHON_INTERPRETER} -m pip install -r requirements.txt")
-    elif dependency_file == "environment.yml":
+    elif DEPENDENCY_FILE == "environment.yml":
         ctx.run(f"conda env update --name {PROJECT_NAME} --file environment.yml --prune")
-    elif dependency_file == "Pipfile":
+    elif DEPENDENCY_FILE == "Pipfile":
         ctx.run("pipenv install")
 
 @task
@@ -45,50 +47,48 @@ def format(ctx):
 @task
 def sync_data_down(ctx):
     """Download Data from storage system"""
-    storage_system = "{{ cookiecutter.dataset_storage }}"
-    if storage_system == "s3":
-        bucket = "{{ cookiecutter.dataset_storage.s3.bucket }}"
-        profile = "{{ cookiecutter.dataset_storage.s3.aws_profile }}"
-        profile_option = f" --profile {profile}" if profile != "default" else ""
-        ctx.run(f"aws s3 sync s3://{bucket}/data/ data/{profile_option}")
-    elif storage_system == "azure":
-        container = "{{ cookiecutter.dataset_storage.azure.container }}"
-        ctx.run(f"az storage blob download-batch -s {container}/data/ -d data/")
-    elif storage_system == "gcs":
-        bucket = "{{ cookiecutter.dataset_storage.gcs.bucket }}"
-        ctx.run(f"gsutil -m rsync -r gs://{bucket}/data/ data/")
+    if DATASET_STORAGE:
+        if DATASET_STORAGE == "s3":
+            bucket = "{{ cookiecutter.dataset_storage.s3.bucket }}"
+            profile = "{{ cookiecutter.dataset_storage.s3.aws_profile }}"
+            profile_option = f" --profile {profile}" if profile != "default" else ""
+            ctx.run(f"aws s3 sync s3://{bucket}/data/ data/{profile_option}")
+        elif DATASET_STORAGE == "azure":
+            container = "{{ cookiecutter.dataset_storage.azure.container }}"
+            ctx.run(f"az storage blob download-batch -s {container}/data/ -d data/")
+        elif DATASET_STORAGE == "gcs":
+            bucket = "{{ cookiecutter.dataset_storage.gcs.bucket }}"
+            ctx.run(f"gsutil -m rsync -r gs://{bucket}/data/ data/")
 
 @task
 def sync_data_up(ctx):
     """Upload Data to storage system"""
-    storage_system = "{{ cookiecutter.dataset_storage }}"
-    if storage_system == "s3":
-        bucket = "{{ cookiecutter.dataset_storage.s3.bucket }}"
-        profile = "{{ cookiecutter.dataset_storage.s3.aws_profile }}"
-        profile_option = f" --profile {profile}" if profile != "default" else ""
-        ctx.run(f"aws s3 sync data/ s3://{bucket}/data{profile_option}")
-    elif storage_system == "azure":
-        container = "{{ cookiecutter.dataset_storage.azure.container }}"
-        ctx.run(f"az storage blob upload-batch -d {container}/data/ -s data/")
-    elif storage_system == "gcs":
-        bucket = "{{ cookiecutter.dataset_storage.gcs.bucket }}"
-        ctx.run(f"gsutil -m rsync -r data/ gs://{bucket}/data/")
+    if DATASET_STORAGE:
+        if DATASET_STORAGE == "s3":
+            bucket = "{{ cookiecutter.dataset_storage.s3.bucket }}"
+            profile = "{{ cookiecutter.dataset_storage.s3.aws_profile }}"
+            profile_option = f" --profile {profile}" if profile != "default" else ""
+            ctx.run(f"aws s3 sync data/ s3://{bucket}/data{profile_option}")
+        elif DATASET_STORAGE == "azure":
+            container = "{{ cookiecutter.dataset_storage.azure.container }}"
+            ctx.run(f"az storage blob upload-batch -d {container}/data/ -s data/")
+        elif DATASET_STORAGE == "gcs":
+            bucket = "{{ cookiecutter.dataset_storage.gcs.bucket }}"
+            ctx.run(f"gsutil -m rsync -r data/ gs://{bucket}/data/")
 
 @task
 def create_environment(ctx):
     """Set up python interpreter environment"""
-    environment_manager = "{{ cookiecutter.environment_manager }}"
-    dependency_file = "{{ cookiecutter.dependency_file }}"
-    if environment_manager == "conda":
-        if dependency_file != "environment.yml":
+    if ENVIRONMENT_MANAGER == "conda":
+        if DEPENDENCY_FILE != "environment.yml":
             ctx.run(f"conda create --name {PROJECT_NAME} python={PYTHON_VERSION} -y")
         else:
             ctx.run(f"conda env create --name {PROJECT_NAME} -f environment.yml")
         print(f">>> conda env created. Activate with:\nconda activate {PROJECT_NAME}")
-    elif environment_manager == "virtualenv":
+    elif ENVIRONMENT_MANAGER == "virtualenv":
         ctx.run(f"virtualenv {PROJECT_NAME} --python={PYTHON_INTERPRETER}")
         print(f">>> New virtualenv created. Activate with:\nsource {PROJECT_NAME}/bin/activate")
-    elif environment_manager == "pipenv":
+    elif ENVIRONMENT_MANAGER == "pipenv":
         ctx.run(f"pipenv --python {PYTHON_VERSION}")
         print(f">>> New pipenv created. Activate with:\npipenv shell")
 
