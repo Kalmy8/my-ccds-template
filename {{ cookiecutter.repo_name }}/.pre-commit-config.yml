@@ -12,7 +12,7 @@ repos:
   rev: 5.12.0
   hooks:
   - id: isort
-    args: [{{ cookiecutter.module_namen }}/]
+    args: [{{ cookiecutter.module_name }}/]
 
 - repo: https://github.com/psf/black
   rev: 23.3.0
