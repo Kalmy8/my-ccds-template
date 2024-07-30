@@ -40,7 +40,7 @@ skip_glob = ["**/migrations/*", "**/settings/*"]
 src_paths = ["./{{ cookiecutter.module_name }}"]
 
 [tool.mypy]
-mypy_path = {{ cookiecutter.module_name }}
+mypy_path = "{{ cookiecutter.module_name }}"
 check_untyped_defs = true
 disallow_any_generics = true
 ignore_missing_imports = true
