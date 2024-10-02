@@ -28,6 +28,7 @@ packages_to_install += basic
 pip_only_packages = [
     "awscli",
     "python-dotenv",
+    "Flake8-pyproject"
 ]
 
 # Use the selected documentation package specified in the config,

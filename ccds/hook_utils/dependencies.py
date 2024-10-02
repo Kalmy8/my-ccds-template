@@ -4,6 +4,8 @@ packages = [
     "isort",
     "pip",
     "python-dotenv",
+    "invoke",
+    "Flake8-pyproject"
 ]
 
 basic = [
