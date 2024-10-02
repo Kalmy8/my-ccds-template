@@ -95,12 +95,14 @@ def create_environment(ctx):
         print("Environment manager was not configured during project creation.",
               "Set up an environment manually or re-do the project creation process.", sep ='\n')
 
-    elif ENVIRONMENT_MANAGER == "conda":
+    elif ENVIRONMENT_MANAGER in ("conda", "mamba"):
+        env_manager = "mamba" if ENVIRONMENT_MANAGER == "mamba" else "conda"
         if DEPENDENCY_FILE != "environment.yml":
-            ctx.run(f"conda create --name {PROJECT_NAME} python={PYTHON_VERSION} -y -v")
+            ctx.run(f"{env_manager} create --name {PROJECT_NAME} python={PYTHON_VERSION} -y -v")
         else:
-            ctx.run(f"conda env create --name {PROJECT_NAME} -f environment.yml")
-        print(f">>> conda env created. Activate with:\nconda activate {PROJECT_NAME}")
+            ctx.run(f"{env_manager} env create --name {PROJECT_NAME} -f environment.yml")
+        print(f">>> {env_manager} env created. Activate with:\n{env_manager} activate {PROJECT_NAME}")
+
     elif ENVIRONMENT_MANAGER == "virtualenv":
         ctx.run(f"virtualenv {PROJECT_NAME} --python={PYTHON_INTERPRETER}")
         print(f">>> New virtualenv created. Activate with:\nsource {PROJECT_NAME}/bin/activate")
