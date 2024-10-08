@@ -5,7 +5,9 @@ packages = [
     "pip",
     "python-dotenv",
     "invoke",
-    "Flake8-pyproject"
+    "Flake8-pyproject",
+    "commitizen",
+    "pre-commit"
 ]
 
 basic = [
