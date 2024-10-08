@@ -14,7 +14,6 @@ repos:
   rev: 5.13.2
   hooks:
   - id: isort
-    args: [prepCV/]
 
 - repo: https://github.com/psf/black
   rev: 24.8.0
@@ -37,3 +36,8 @@ repos:
     args: [--python-version=3.9 , --config-file=pyproject.toml]
     additional_dependencies: [types-requests]
 
+- repo: https://github.com/commitizen-tools/commitizen
+  rev: v3.29.1
+  hooks:
+  - id: commitizen
+    stages: [commit-msg]
