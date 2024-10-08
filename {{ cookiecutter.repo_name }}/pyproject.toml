@@ -20,12 +20,7 @@ requires-python = "~={{ cookiecutter.python_version_number }}"
 [tool.black]
 line-length = 99
 include = '\.pyi?$'
-exclude = '''
-/(
-    \.git
-  | \.venv
-)/
-'''
+exclude = '''\.git|\.venv'''
 
 [tool.ruff.lint.isort]
 known_first_party = ["{{ cookiecutter.module_name }}"]
