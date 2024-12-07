@@ -120,8 +120,8 @@ def data(ctx):
 def help(ctx):
     """Display help message"""
     print("Available tasks:")
-    for task in ctx.collection:
-        print(f"{task.name}: {task.help}")
+    for name, task in ns.tasks.items():
+        print(f"- {name}: {task.__doc__ if task.__doc__ else 'No description provided'}")
 
 # Aliases for some common tasks
 ns = Collection()
