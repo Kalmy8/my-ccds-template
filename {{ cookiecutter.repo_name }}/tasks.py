@@ -18,7 +18,8 @@ def requirements(ctx):
         ctx.run(f"{PYTHON_INTERPRETER} -m pip install -U pip")
         ctx.run(f"{PYTHON_INTERPRETER} -m pip install -r requirements.txt")
     elif DEPENDENCY_FILE == "environment.yml":
-        ctx.run(f"conda env update --name {PROJECT_NAME} --file environment.yml --prune")
+        env_manager = "mamba" if ENVIRONMENT_MANAGER == "mamba" else "conda"
+        ctx.run(f"{env_manager} env update --name {PROJECT_NAME} --file environment.yml --prune")
     elif DEPENDENCY_FILE == "Pipfile":
         ctx.run("pipenv install")
 
